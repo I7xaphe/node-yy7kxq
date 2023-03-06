@@ -34,7 +34,7 @@ fs.readFile('./index.html', function (err, html) {
     }
   });
 
-  server.listen(3002, () => {
-    console.log('Server started on port 3000');
+  server.listen(80, () => {
+    console.log('Server started on port 80');
   });
 });
