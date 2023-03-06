@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <title>Refresh Data Example</title>
+  </head>
+  <body>
+    <table id="temp-table">
+      <tr>
+        <th>Sensor ID</th>
+        <th>Temperature</th>
+      </tr>
+    </table>
+
+    <script>
+      const refreshInterval = 1000; // in milliseconds
+      setInterval(() => {
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+              const data = JSON.parse(xhr.responseText);
+              let html = '';
+              for (const key in data) {
+                html +=
+                  '<tr><td>' + key + '</td><td>' + data[key] + '</td></tr>';
+              }
+              const table = document.getElementById('temp-table');
+              table.innerHTML =
+                '<tr><th>Sensor ID</th><th>Temperature</th></tr>' + html;
+            }
+          }
+        };
+        xhr.open('GET', '/data');
+        xhr.send();
+      }, refreshInterval);
+    </script>
+  </body>
+</html>
