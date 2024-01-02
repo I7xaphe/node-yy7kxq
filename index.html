@@ -1,111 +1,172 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Heating system temperature monitore</title>
-    <style>
-      /* Add some basic styling to the table */
-      table {
-        border-collapse: collapse;
-        width: 100%;
-      }
 
-      th,
-      td {
-        padding: 8px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-      }
+<head>
+  <title>Heating system temperature monitore</title>
+  <style>
+    /* Add some basic styling to the table */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
 
-      th {
-        background-color: #f2f2f2;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Heating system temperature monitor</h2>
-    <table id="temp-table">
-      <tr>
-        <th width="30px">Lp.</th>
-        <th>Position</th>
-        <th>Temperature</th>
-        <th>Sensor ID</th>
-      </tr>
-    </table>
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
 
-    <script>
-      const refreshInterval = 1000; // in milliseconds
-      setInterval(() => {
-        const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-          if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-              const data = JSON.parse(xhr.responseText);
-              let html = '';
-              let lp = 0;
-              for (const key in data) {
-                lp++;
-                html +=
-                  '<tr><td>' +
-                  lp +
-                  '</td><td>' +
-                  'unknown' +
-                  '</td><td>' +
-                  data[key] +
-                  '</td><td>' +
-                  key +
-                  '</td></tr>';
-              }
-              const table = document.getElementById('temp-table');
-              table.innerHTML =
-                '<tr><th width="30px">Lp.</th><th>Position</th><th>Temperature</th><th>Sensor ID</th></tr>' +
-                html;
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .margintop {
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Heating system temperature monitor</h2>
+  <table id="temp-table">
+    <tr>
+      <th width="30px">Lp.</th>
+      <th>Position</th>
+      <th>Temperature</th>
+      <th>Sensor ID</th>
+    </tr>
+  </table>
+
+  <script>
+    const refreshInterval = 5000; // in milliseconds
+    setInterval(() => {
+      const xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText);
+            let html = '';
+            let lp = 0;
+            for (const key in data) {
+              lp++;
+              html +=
+                '<tr><td>' +
+                lp +
+                '</td><td>' +
+                'unknown' +
+                '</td><td>' +
+                data[key] +
+                '</td><td>' +
+                key +
+                '</td></tr>';
             }
+            const table = document.getElementById('temp-table');
+            table.innerHTML =
+              '<tr><th width="30px">Lp.</th><th>Position</th><th>Temperature</th><th>Sensor ID</th></tr>' +
+              html;
           }
-        };
-        xhr.open('GET', '/data');
-        xhr.send();
-      }, refreshInterval);
-    </script>
-
-<form id="myForm">
-  <label for="logtime">Log Time [h]:</label>
-  <input type="number" id="logtime" name="logtime" min="1" max="12">
-  <button type="button" onclick="sendLogTimePostRequest()">Submit</button>
-</form>
-
-<div id="result"></div>
-
-<script>
-  function sendLogTimePostRequest() {
-    const logtime = document.getElementById('logtime').value;
-
-    // Create a new XMLHttpRequest object
-    const xhr = new XMLHttpRequest();
-
-    // Set up the request
-    xhr.open('POST', '/logtime', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-    // Set up the callback function to handle the response
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status === 200) {
-          const data = JSON.parse(xhr.responseText);
-          document.getElementById('result').innerText = 'Server response: ' + xhr.responseText;
-        } else {
-          // There was an error with the request
-          console.error('Error:', xhr.status, xhr.statusText);
         }
-      }
-    };
+      };
+      xhr.open('GET', '/data');
+      xhr.send();
+    }, refreshInterval);
+  </script>
 
-    // Prepare the data to be sent
-    const formData = `logtime=${encodeURIComponent(logtime)}`;
+  <form id="logtimeform" class="margintop">
+    <label for="logtime">Log Time [h]:</label>
+    <input type="number" id="logtime" name="logtime" min="1" max="12">
+    <button type="button" onclick="sendLogTimePostRequest()">Submit</button>
+  </form>
 
-    // Send the request with the form data
-    xhr.send(formData);
-  }
-</script>
+  <script>
+    function sendLogTimePostRequest() {
+      const logtime = document.getElementById('logtime').value;
 
-  </body>
+      // Create a new XMLHttpRequest object
+      const xhr = new XMLHttpRequest();
+
+      // Set up the request
+      xhr.open('POST', '/logtime', true);
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+      // Set up the callback function to handle the response
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            const data = JSON.parse(xhr.responseText);
+            document.getElementById('result').innerText = 'Server response: ' + xhr.responseText;
+          } else {
+            // There was an error with the request
+            console.error('Error:', xhr.status, xhr.statusText);
+          }
+        }
+      };
+
+      // Prepare the data to be sent
+      const formData = `logtime=${encodeURIComponent(logtime)}`;
+
+      // Send the request with the form data
+      xhr.send(formData);
+    }
+  </script>
+
+  <button onclick="downloadCsv()" class="margintop">Download CSV</button>
+
+  <script>
+    function downloadCsv() {
+      // Create a new XMLHttpRequest object
+      const xhr = new XMLHttpRequest();
+
+      // Set up the GET request
+      xhr.open('GET', '/downloadCsv', true);
+      xhr.responseType = 'blob'; // Set response type to blob
+
+      // Set up the callback function to handle the response
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            // The request was successful
+            const blob = xhr.response;
+
+            // Create a link element to download the CSV file
+            const a = document.createElement('a');
+            a.href = window.URL.createObjectURL(blob);
+            a.download = 'data.csv';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+
+            // Trigger a click on the link to initiate the download
+            a.click();
+
+            // Remove the link element from the document
+            document.body.removeChild(a);
+
+
+            const reader = new FileReader();
+            reader.onload = function () {
+              const textContent = reader.result;
+              console.log('Text content of the Blob:', textContent);
+              document.getElementById('result').innerText = 'Download done: \n' + textContent;
+              // Use the text content as needed
+            };
+
+            reader.readAsText(blob);
+
+          } else {
+            // There was an error with the request
+            console.error('Error:', xhr.status, xhr.statusText);
+            document.getElementById('result').innerText = 'Download fail!';
+          }
+        }
+      };
+
+      // Send the GET request
+      xhr.send();
+    }
+  </script>
+
+  <div id="result" class="margintop"></div>
+</body>
+
 </html>
