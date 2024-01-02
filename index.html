@@ -68,30 +68,30 @@
     </script>
 
 <form id="myForm">
-  <label for="quantity">Quantity:</label>
-  <input type="number" id="quantity" name="quantity" min="1" max="5">
-  <button type="button" onclick="sendPostRequest()">Submit</button>
+  <label for="logtime">Log Time [h]:</label>
+  <input type="number" id="logtime" name="logtime" min="1" max="12">
+  <button type="button" onclick="sendLogTimePostRequest()">Submit</button>
 </form>
 
 <div id="result"></div>
 
 <script>
-  function sendPostRequest() {
-    const quantity = document.getElementById('quantity').value;
+  function sendLogTimePostRequest() {
+    const logtime = document.getElementById('logtime').value;
 
     // Create a new XMLHttpRequest object
     const xhr = new XMLHttpRequest();
 
     // Set up the request
-    xhr.open('POST', '/process', true);
+    xhr.open('POST', '/logtime', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
     // Set up the callback function to handle the response
     xhr.onreadystatechange = function () {
       if (xhr.readyState === XMLHttpRequest.DONE) {
         if (xhr.status === 200) {
-          // The request was successful
-          //document.getElementById('result').innerText = 'Server response: ' + xhr.responseText;
+          const data = JSON.parse(xhr.responseText);
+          document.getElementById('result').innerText = 'Server response: ' + xhr.responseText;
         } else {
           // There was an error with the request
           console.error('Error:', xhr.status, xhr.statusText);
@@ -100,7 +100,7 @@
     };
 
     // Prepare the data to be sent
-    const formData = `quantity=${encodeURIComponent(quantity)}`;
+    const formData = `logtime=${encodeURIComponent(logtime)}`;
 
     // Send the request with the form data
     xhr.send(formData);
