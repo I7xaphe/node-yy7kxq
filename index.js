@@ -15,7 +15,7 @@ const time = { "time": new Date().toLocaleString() };
 const merged = { ...time, ...data };
 dataMap.push(merged);
 
-var intevalMs = 5000;
+var intevalMs = 12000;
 var logHour = 5;
 var logSize = 3;
 
