@@ -45,8 +45,6 @@
       return !isNaN(num)
     }
 
-    //document.getElementById('alarmThld').value = '2';
-
     function setAlarmThld() {
       const thld = document.getElementById('alarmThld').value;
 
@@ -64,7 +62,7 @@
       snd.play();
     }
 
-    const refreshInterval = 2000; // in milliseconds
+    const refreshInterval = 4000; // in milliseconds
     setInterval(function getDataFn() {
       const xhr = new XMLHttpRequest();
       xhr.onreadystatechange = function () {
@@ -222,8 +220,6 @@
       xhr.send();
     }
   </script>
-
-
 
   <div id="result" class="margintop"></div>
 </body>
