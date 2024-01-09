@@ -2,6 +2,8 @@ const http = require('http');
 var fs = require('fs');
 var qs = require('querystring');
 const json2csv = require('json2csv');
+const { Worker, isMainThread, parentPort } = require('worker_threads');
+const { MEAS_INTERVAL } = require('./constans')
 
 let data = {
   '28-0000097807f2': 75.4,
@@ -15,34 +17,36 @@ const time = { "time": new Date().toLocaleString() };
 const merged = { ...time, ...data };
 dataMap.push(merged);
 
-var intevalMs = 12000;
 var logHour = 5;
 var logSize = 3;
 
 function reloadLogSize() {
-  logSize = (logHour * 60 * 60 * 1000) / intevalMs;
+  logSize = (logHour * 60 * 60 * 1000) / MEAS_INTERVAL;
 }
 
 reloadLogSize();
 
-setInterval(() => {
-  // Update the data with random temperatures for each sensor
-  for (const key in data) {
-    data[key] = Math.floor(Math.random() * 50) + 10;
-  }
-  //process.stdout.write('\u0007');
+if (isMainThread) {
 
-  const time = { "time": new Date().toLocaleString() };
-  const merged = { ...time, ...data };
+  const worker = new Worker('./worker', { eval: false });
 
-  dataMap.push(merged);
-  while (dataMap.length > logSize) {
-    dataMap.shift();
-  }
+  // Handle messages from the worker thread
+  worker.on('message', (message) => {
+    console.log(`Received message from worker: ${message}`);
+    data = JSON.parse(message);
 
-}, intevalMs);
+    const time = { "time": new Date().toLocaleString() };
+    const merged = { ...time, ...data };
 
-function isNumeric(num){
+    dataMap.push(merged);
+    while (dataMap.length > logSize) {
+      dataMap.shift();
+    }
+
+  });
+}
+
+function isNumeric(num) {
   return !isNaN(num)
 }
 
@@ -73,8 +77,7 @@ fs.readFile('./index.html', function (err, html) {
         req.on('end', function () {
           var post = qs.parse(body);
 
-          if (isNumeric(post.logtime))
-          {
+          if (isNumeric(post.logtime)) {
             if (post.logtime > 0) {
               logHour = post.logtime;
             } else {
